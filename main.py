@@ -58,8 +58,9 @@ while True:
                 with open(
                     image_save_directory + '/' + str(post['id']) + '.txt', 'w'
                 ) as f:
+                    post['tag_string'] = ", ".join([i for i in post['tag_string'].split()])
                     f.write(
-                        'masterpiece, highest quality, ' + content_type + ' ' + post['tag_string']
+                        'masterpiece, highest quality, ' + content_type + ', ' + post['tag_string']
                     )
                     print('saved tags')
         else:
