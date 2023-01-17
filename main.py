@@ -33,7 +33,7 @@ while True:
     
     # Retrieve post data from Danbooru API
     response = requests.get(
-        'https://danbooru.donmai.us/posts/' + id + '.json?login=anon&api_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+        'https://danbooru.donmai.us/posts/' + id + '.json'
     )
     
     # Check if post data was retrieved successfully
