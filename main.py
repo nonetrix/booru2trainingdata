@@ -1,6 +1,24 @@
 import requests, cv2, math, os
 import numpy as np
 
+headers = {
+    'User-Agent': 'Booru2Training data a0.3',
+}
+
+def get_image_danbooru(id):
+    response = requests.get(
+        'https://danbooru.donmai.us/posts/' + id + '.json', headers=headers
+    )
+    if response.status_code == 200:
+        post = response.json()
+        print(post['file_url'])
+        return {"file_url": post['file_url'], "file_ext": post['file_ext'], "id": post['id'], "tag_string": post['tag_string']}
+    else:
+        print('request failed')
+        print(response.status_code)
+        print(response.text)
+        print('\n')
+
 # Ask user for image save directory and store input
 print('Pick a directory to save images to, it must already exist: ')
 image_save_directory = input()
@@ -31,39 +49,33 @@ while True:
     print('Enter a image ID for Danbooru:')
     id = input()
     
-    # Retrieve post data from Danbooru API
-    response = requests.get(
-        'https://danbooru.donmai.us/posts/' + id + '.json'
-    )
+    # Get the post for the given ID
+    post = get_image_danbooru(id)
+        
+    # Retrieve image from file URL
+    image_response = requests.get(post['file_url'], headers=headers)
     
-    # Check if post data was retrieved successfully
-    if response.status_code == 200:
-        post = response.json()
+    # Check if image was retrieved successfully
+    if image_response.status_code == 200:
         
-        # Retrieve image from file URL
-        image_response = requests.get(post['file_url'])
-        
-        # Check if image was retrieved successfully
-        if image_response.status_code == 200:
-            
-            # Save image to specified directory
+        # Save image to specified directory
+        with open(
+            image_save_directory + '/' + str(post['id']) + '.' + post['file_ext'], 'wb'
+        ) as f:
+            f.write(image_response.content)
+
+            print('Image downloaded successfully.')
+
+            # Save image tags to a text file
             with open(
-                image_save_directory + '/' + str(post['id']) + '.' + post['file_ext'], 'wb'
+                image_save_directory + '/' + str(post['id']) + '.txt', 'w'
             ) as f:
-                f.write(image_response.content)
-
-                print('Image downloaded successfully.')
-
-                # Save image tags to a text file
-                with open(
-                    image_save_directory + '/' + str(post['id']) + '.txt', 'w'
-                ) as f:
-                    post['tag_string'] = ", ".join([i for i in post['tag_string'].split()])
-                    f.write(
-                        'masterpiece, highest quality, ' + content_type + ', ' + post['tag_string']
-                    )
-                    print('saved tags')
-        else:
-            print('Failed to download image.')
+                post['tag_string'] = ", ".join([i for i in post['tag_string'].split()])
+                f.write(
+                    'masterpiece, highest quality, ' + content_type + ', ' + post['tag_string']
+                )
+                print('saved tags')
     else:
-        print('Failed to retrieve post data: ' + response)
+        print('Failed to download image.')
+else:
+    print('Failed to retrieve post data: ' + response)
