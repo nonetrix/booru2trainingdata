@@ -1,5 +1,4 @@
-import requests
-import os
+import requests, os
 
 # User-Agent header for request
 headers = {'User-Agent': 'Booru2Training data a0.3'}
