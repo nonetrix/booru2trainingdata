@@ -50,10 +50,10 @@ print('Pick a directory to save images to, it must already exist: ')
 image_save_directory = input()
 
 # Get user's choice of booru service
-print('What Booru service would you like to use?')
-print('1. Danbooru(What most anime models are already trained on)')
-print('2. Gelbooru(Tags can be diffrent so might not be as good, however has less censorship without Gold account)')
-print('Pick a number 1..2:')
+print('''What Booru service would you like to use?
+1. Danbooru(What most anime models are already trained on)
+2. Gelbooru(Tags can be diffrent so might not be as good, however has less censorship without Gold account)
+Pick a number 1..2: ''')
 booru_choice = int(input())
 
 # If user chooses Gelbooru, check if they want to change default URL
