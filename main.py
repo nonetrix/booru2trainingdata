@@ -85,7 +85,7 @@ if booru_choice == 2:
     print('Would you like to change the Gelbooru URL from the default(https://gelbooru.com)? (Y/n):')
     url_choice = input()
     if url_choice.upper() == 'Y':
-        print("Please type a URL: ")
+        print('Please type a URL: ')
         gelbooru_url = input()
     elif url_choice.upper() == 'N':
         gelbooru_url = 'https://gelbooru.com/'
@@ -95,7 +95,7 @@ elif(booru_choice == 3):
     print('Would you like to change the Gelbooru URL from the default(https://rule34.xxx/)? (Y/n):')
     url_choice = input()
     if url_choice.upper() == 'Y':
-        print("Please type a URL: ")
+        print('Please type a URL: ')
         gelbooru_url_old = input()
     elif url_choice.upper() == 'N':
         gelbooru_url_old = 'https://rule34.xxx/'
