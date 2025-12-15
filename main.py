@@ -16,7 +16,11 @@ print('''What Booru service would you like to use?
 Pick a number 1..3: ''')
 booru_choice = int(input())
 
-# If user chooses Gelbooru, check if they want to change default URL
+# Initialize variables for Gelbooru auth
+gb_api_key = ''
+gb_user_id = ''
+
+# If user chooses Gelbooru, check if they want to change default URL and ask for Auth
 if booru_choice == 2:
     print('Would you like to change the Gelbooru URL from the default(https://gelbooru.com)? (Y/n):')
     url_choice = input()
@@ -25,6 +29,12 @@ if booru_choice == 2:
         gelbooru_url = input()
     elif url_choice.upper() == 'N':
         gelbooru_url = 'https://gelbooru.com/'
+    
+    # Ask for API credentials for Gelbooru
+    print('Please enter your Gelbooru API Key:')
+    gb_api_key = input()
+    print('Please enter your Gelbooru User ID:')
+    gb_user_id = input()
 
 # If user chooses old Gelbooru, check if they want to change default URL
 elif(booru_choice == 3):
@@ -52,27 +62,38 @@ while True:
     elif booru_choice == 2:
         print('Enter a image ID for Gelbooru:')
         id = input()
-        post = boorus.get_image_gelbooru(id, gelbooru_url, headers)
+        # Pass api_key and user_id here
+        post = boorus.get_image_gelbooru(id, gelbooru_url, headers, gb_api_key, gb_user_id)
     elif booru_choice == 3:
         print('Enter a image ID for Gelbooru:')
         id = input()
         post = boorus.get_image_gelbooru_old(id, gelbooru_url_old, headers)
 
-    # Make request to download image
-    image_response = requests.get(post['file_url'], headers=headers)
+    if post:
+        # Make request to download image
+        image_response = requests.get(post['file_url'], headers=headers)
 
-    # Check if request was successful
-    if image_response.status_code == 200:
-        # Save image to specified directory
-        with open(f"{image_save_directory}/{post['id']}.{post['file_ext']}", 'wb') as f:
-            f.write(image_response.content)
-            print('Image downloaded successfully.')
+        # Check if request was successful
+        if image_response.status_code == 200:
+            # Save image to specified directory
+            with open(f"{image_save_directory}/{post['id']}.{post['file_ext']}", 'wb') as f:
+                f.write(image_response.content)
+                print('Image downloaded successfully.')
 
-            # Save image tags to text file
-            with open(f"{image_save_directory}/{post['id']}.txt", 'w') as f:
-                post['tag_string'] = ', '.join([i for i in post['tag_string'].split()])
-                f.write(f"masterpiece, highest quality, {content_type}, {post['tag_string']}")
-                print('saved tags')
+                # Save image tags to text file
+                with open(f"{image_save_directory}/{post['id']}.txt", 'w') as f:
+                    # 1. Convert space-separated API tags to comma-separated
+                    processed_tags = ', '.join([i for i in post['tag_string'].split()])
+                    
+                    # 2. Replace underscores with spaces
+                    processed_tags = processed_tags.replace('_', ' ')
+                    
+                    # 3. Escape parentheses
+                    processed_tags = processed_tags.replace('(', '\(').replace(')', '\)')
+                    
+                    f.write(f"masterpiece, highest quality, {content_type}, {processed_tags}")
+                    print('saved tags')
+        else:
+            print('Failed to download image.')
     else:
-        print('Failed to download image.')
-
+        print('Failed to retrieve post data.')
