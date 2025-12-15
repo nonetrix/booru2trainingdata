@@ -1,12 +1,27 @@
-import requests, os
+import requests, os, sys
 import boorus
 
 # User-Agent header for request
 headers = {'User-Agent': 'Booru2Training data a0.3'}
 
-# Get directory to save images
-print('Pick a directory to save images to, it must already exist: ')
+# --- Directory Handling ---
+print('Pick a directory to save images to: ')
 image_save_directory = input()
+
+if not os.path.exists(image_save_directory):
+    print(f"The directory '{image_save_directory}' does not exist. Would you like to create it? (Y/n): ")
+    create_dir = input()
+    if create_dir.upper() == 'Y':
+        try:
+            os.makedirs(image_save_directory)
+            print(f"Created directory: {image_save_directory}")
+        except OSError as e:
+            print(f"Error creating directory: {e}")
+            sys.exit(1)
+    else:
+        print("Directory required. Exiting.")
+        sys.exit(1)
+# --------------------------
 
 # Get user's choice of booru service
 print('''What Booru service would you like to use?
@@ -55,6 +70,8 @@ elif nsfw_choice.upper() == 'N':
     content_type = 'sfw'
 
 while True:
+    post = None  # Reset post variable
+    
     if booru_choice == 1:
         print('Enter a image ID for Danbooru:')
         id = input()
@@ -62,7 +79,6 @@ while True:
     elif booru_choice == 2:
         print('Enter a image ID for Gelbooru:')
         id = input()
-        # Pass api_key and user_id here
         post = boorus.get_image_gelbooru(id, gelbooru_url, headers, gb_api_key, gb_user_id)
     elif booru_choice == 3:
         print('Enter a image ID for Gelbooru:')
@@ -88,8 +104,8 @@ while True:
                     # 2. Replace underscores with spaces
                     processed_tags = processed_tags.replace('_', ' ')
                     
-                    # 3. Escape parentheses
-                    processed_tags = processed_tags.replace('(', '\(').replace(')', '\)')
+                    # 3. Escape parentheses (Fixed SyntaxWarning by using double backslash)
+                    processed_tags = processed_tags.replace('(', '\\(').replace(')', '\\)')
                     
                     f.write(f"masterpiece, highest quality, {content_type}, {processed_tags}")
                     print('saved tags')
