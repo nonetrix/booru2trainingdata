@@ -1,0 +1,7 @@
+# Rust build output
+/target
+/build
+
+# Agent workspace metadata (not part of the project)
+/.codebuff/
+/.freebuff/
